@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE resources PUBLIC "-//GlassFish.org//DTD GlassFish Application Server 3.1 Resource Definitions//EN"
+        "http://glassfish.org/dtds/glassfish-resources_1_5.dtd">
+<resources>
+    <jdbc-connection-pool name="java:app/jdbc/pool/books"
+                          res-type="javax.sql.ConnectionPoolDataSource"
+                          datasource-classname="org.postgresql.ds.PGConnectionPoolDataSource"
+                          pool-resize-quantity="4"
+                          max-pool-size="32"
+                          steady-pool-size="8">
+        <property name="serverName" value="${ENV=DB_HOST}"/>
+        <property name="databaseName" value="${ENV=DB_USER}"/>
+        <property name="user" value="${ENV=DB_USER}"/>
+        <property name="password" value="${ENV=DB_PWD}"/>
+    </jdbc-connection-pool>
+
+    <jdbc-resource enabled="true"
+                   jndi-name="java:app/jdbc/ds/books"
+                   object-type="user"
+                   pool-name="jdbc/pool/books">
+        <description>Pooled data source for the books database</description>
+    </jdbc-resource>
+
+</resources>
