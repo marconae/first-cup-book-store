@@ -22,6 +22,10 @@
         <dep.omnifaces.version>3.7.1</dep.omnifaces.version>
         <dep.lombok.version>1.18.12</dep.lombok.version>
 
+        <!-- Payara BOM -->
+        <dep.payara-api.version>5.2022.1</dep.payara-api.version>
+        <dep.cache-api.version>1.1.1</dep.cache-api.version>
+
         <!-- Testing -->
         <dep.mockito.version>3.4.6</dep.mockito.version>
         <dep.junit.jupiter.version>5.7.0-M1</dep.junit.jupiter.version>
@@ -103,6 +107,18 @@
             <groupId>jakarta.platform</groupId>
             <artifactId>jakarta.jakartaee-api</artifactId>
             <version>${dep.jakarta.ee.version}</version>
+            <scope>provided</scope>
+        </dependency>
+        <dependency>
+            <groupId>fish.payara.api</groupId>
+            <artifactId>payara-api</artifactId>
+            <version>${dep.payara-api.version}</version>
+            <scope>provided</scope>
+        </dependency>
+        <dependency>
+            <groupId>javax.cache</groupId>
+            <artifactId>cache-api</artifactId>
+            <version>${dep.cache-api.version}</version>
             <scope>provided</scope>
         </dependency>
 
