@@ -1,0 +1,22 @@
+version: 1
+task_definition:
+  task_role_arn: ecsTaskExecutionRole
+  task_execution_role: ecsTaskExecutionRole
+  ecs_network_mode: bridge
+  task_size:
+    cpu_limit: 2048
+    memory_limit: 2048
+  services:
+    book-store-task:
+      cpu_shares: 2048
+      mem_reservation: 1024
+      healthcheck:
+        test: ["CMD", "curl -f http://localhost:8080/book-store/resources/health || exit 1"]
+run_params:
+  network_configuration:
+    awsvpc_configuration:
+      subnets:
+        - subnet-051022f508b9555a9
+        - subnet-03e609a66f3260f48
+      security_groups:
+        - sg-0b752d4e5dd10e8b6

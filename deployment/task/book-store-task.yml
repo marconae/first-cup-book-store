@@ -1,0 +1,15 @@
+version: '3'
+services:
+  book-store-task:
+    image: 964739173525.dkr.ecr.eu-central-1.amazonaws.com/playground/book-store-micro:latest
+    ports:
+      - "80:8080"
+    environment:
+      - DB_HOST=books-db.c1gaylsnpdht.eu-central-1.rds.amazonaws.com
+      - DB_PWD=wm4xsbwfU0c3EYMWhZKt
+    logging:
+      driver: awslogs
+      options:
+        awslogs-group: /ecs/task/book-store
+        awslogs-region: eu-central-1
+        awslogs-stream-prefix: ecs-task

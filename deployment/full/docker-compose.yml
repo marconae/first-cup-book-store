@@ -1,0 +1,35 @@
+version: '2'
+
+services:
+  book-store-1:
+    image: playground/book-store-full:latest
+    ports:
+      - "91:8080"
+      - "92:4848"
+    environment:
+      - DB_HOST=books-db.c1gaylsnpdht.eu-central-1.rds.amazonaws.com
+      - DB_PWD=wm4xsbwfU0c3EYMWhZKt
+      - PAYARA_INSTANCE_NAME=node-1
+    networks:
+      y-net:
+        ipv4_address: 172.28.1.1
+
+  book-store-2:
+    image: playground/book-store-full:latest
+    ports:
+      - "81:8080"
+      - "82:4848"
+    environment:
+      - DB_HOST=books-db.c1gaylsnpdht.eu-central-1.rds.amazonaws.com
+      - DB_PWD=wm4xsbwfU0c3EYMWhZKt
+      - PAYARA_INSTANCE_NAME=node-2
+    networks:
+      y-net:
+        ipv4_address: 172.28.1.2
+
+networks:
+  y-net:
+    ipam:
+      driver: default
+      config:
+        - subnet: 172.28.0.0/16

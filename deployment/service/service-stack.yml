@@ -1,0 +1,87 @@
+AWSTemplateFormatVersion: 2010-09-09
+Description: Template to create a book-store-service instance
+Parameters:
+  ServiceName:
+    Type: String
+    Default: book-store-service-1
+  TaskName:
+    Type: String
+    Default: book-store
+  TaskRevision:
+    Type: String
+    Default: 1
+  ECSClusterName:
+    Type: String
+    Default: book-store-cluster
+  SecurityGroupIDs:
+    Type: List<AWS::EC2::SecurityGroup::Id>
+    Default: sg-a9bf33d5
+  SubnetIDs:
+    Type: List<AWS::EC2::Subnet::Id>
+    Default: 'subnet-a623bbcc,subnet-d68b5daa,subnet-badf7af6'
+  VpcID:
+    Type: AWS::EC2::VPC::Id
+    Default: vpc-33992959
+Resources:
+  ECSService:
+    Type: 'AWS::ECS::Service'
+    Properties:
+      Cluster: book-store-cluster
+      TaskDefinition: !Join [ ":", [ !Ref TaskName, !Ref TaskRevision ] ]
+      LaunchType: EC2
+      ServiceName: !Ref ServiceName
+      DesiredCount: 2
+      LoadBalancers:
+        - ContainerName: book-store-micro
+          ContainerPort: 8080
+          TargetGroupArn: !Ref TargetGroup
+      DeploymentConfiguration:
+        MaximumPercent: 200
+        MinimumHealthyPercent: 100
+      DeploymentController:
+        Type: ECS
+    DependsOn: Listener
+  LoadBalancer:
+    Type: 'AWS::ElasticLoadBalancingV2::LoadBalancer'
+    Properties:
+      Name: !Sub
+        - '${ServiceName}-lb'
+        - ServiceName: !Ref ServiceName
+      SecurityGroups: !Ref SecurityGroupIDs
+      Subnets: !Ref SubnetIDs
+      Type: application
+  TargetGroup:
+    Type: 'AWS::ElasticLoadBalancingV2::TargetGroup'
+    Properties:
+      Name: !Sub
+        - '${ServiceName}-trgt-grp'
+        - ServiceName: !Ref ServiceName
+      VpcId: !Ref VpcID
+      Protocol: HTTP
+      Port: 80
+      TargetType: instance
+  Listener:
+    Type: 'AWS::ElasticLoadBalancingV2::Listener'
+    Properties:
+      DefaultActions:
+        - TargetGroupArn: !Ref TargetGroup
+          Type: forward
+      LoadBalancerArn: !Ref LoadBalancer
+      Port: 80
+      Protocol: HTTP
+Outputs:
+  ClusterName:
+    Description: The cluster used to create the service.
+    Value: !Ref ECSClusterName
+  ECSService:
+    Description: The created service.
+    Value: !Ref ECSService
+  LoadBalancer:
+    Description: The created load balancer.
+    Value: !Ref LoadBalancer
+  Listener:
+    Description: The created listener.
+    Value: !Ref Listener
+  TargetGroup:
+    Description: The created target group.
+    Value: !Ref TargetGroup

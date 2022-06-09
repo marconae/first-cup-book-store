@@ -1,0 +1,86 @@
+{
+  "AWSTemplateFormatVersion": "2010-09-09",
+  "Description": "The template used to create an ECS Task definition from the ECS Console.",
+  "Resources": {
+    "ECSTaskDefinition": {
+      "Type": "AWS::ECS::TaskDefinition",
+      "Properties": {
+        "ContainerDefinitions": [
+          {
+            "LogConfiguration": {
+              "Options": {
+                "awslogs-group": "/ecs/book-store",
+                "awslogs-region": "eu-central-1",
+                "awslogs-stream-prefix": "ecs"
+              },
+              "LogDriver": "awslogs"
+            },
+            "Name": "book-store-micro",
+            "Image": "964739173525.dkr.ecr.eu-central-1.amazonaws.com/playground/book-store-micro:latest",
+            "MemoryReservation": 512,
+            "PortMappings": [
+              {
+                "ContainerPort": 8080,
+                "HostPort": "80",
+                "Protocol": "tcp"
+              }
+            ],
+            "Environment": [
+              {
+                "Name": "DB_HOST",
+                "Value": "books-db.c1gaylsnpdht.eu-central-1.rds.amazonaws.com"
+              },
+              {
+                "Name": "DB_PWD",
+                "Value": "wm4xsbwfU0c3EYMWhZKt"
+              }
+            ],
+            "MountPoints": [],
+            "VolumesFrom": [],
+            "ReadonlyRootFilesystem": false,
+            "HealthCheck": {
+              "Command": [
+                "curl -f http://localhost:8080/book-store/resources/health || exit 1"
+              ],
+              "Interval": 300,
+              "Timeout": 5,
+              "Retries": 3
+            },
+            "Essential": true,
+            "Cpu": 0
+          }
+        ],
+        "Family": "book-store",
+        "NetworkMode": "bridge",
+        "TaskRoleArn": "arn:aws:iam::964739173525:role/ecsTaskExecutionRole",
+        "PlacementConstraints": [],
+        "RequiresCompatibilities": [
+          "EC2"
+        ],
+        "Cpu": "2 vCPU",
+        "Memory": "1 GB",
+        "ExecutionRoleArn": "arn:aws:iam::964739173525:role/ecsTaskExecutionRole",
+        "Tags": [
+          {
+            "Key": "ecs:taskDefinition:createdFrom",
+            "Value": "ecs-console-v2"
+          },
+          {
+            "Key": "ecs:taskDefinition:stackId",
+            "Value": {
+              "Ref": "AWS::StackId"
+            }
+          }
+        ]
+      }
+    }
+  },
+  "Outputs": {
+    "TaskDefinitionARN": {
+      "Description": "The created task definition ARN.",
+      "Value": {
+        "Ref": "ECSTaskDefinition"
+      }
+    }
+  }
+}

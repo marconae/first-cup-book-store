@@ -1,0 +1,143 @@
+{
+  "AWSTemplateFormatVersion": "2010-09-09",
+  "Description": "The template used to create an ECS Service from the ECS Console.",
+  "Parameters": {
+    "ECSClusterName": {
+      "Type": "String",
+      "Default": "book-store-cluster"
+    },
+    "SecurityGroupIDs": {
+      "Type": "CommaDelimitedList",
+      "Default": "sg-0b752d4e5dd10e8b6"
+    },
+    "SubnetIDs": {
+      "Type": "CommaDelimitedList",
+      "Default": "subnet-03e609a66f3260f48,subnet-051022f508b9555a9"
+    },
+    "VpcID": {
+      "Type": "String",
+      "Default": "vpc-0ecd7c4353c598277"
+    },
+    "LoadBalancerType": {
+      "Type": "String",
+      "Default": "application",
+      "AllowedValues": [
+        "application",
+        "network"
+      ],
+      "ConstraintDescription": "must specify an application or network load balancer type."
+    },
+    "LoadBalancerName": {
+      "Type": "String",
+      "Default": "book-service-1"
+    }
+  },
+  "Resources": {
+    "ECSService": {
+      "Type": "AWS::ECS::Service",
+      "Properties": {
+        "Cluster": "book-store-cluster",
+        "TaskDefinition": "arn:aws:ecs:eu-central-1:964739173525:task-definition/book-store:7",
+        "LaunchType": "EC2",
+        "ServiceName": "book-store-service-1",
+        "DesiredCount": 2,
+        "LoadBalancers": [
+          {
+            "ContainerName": "book-store-micro",
+            "ContainerPort": 8080,
+            "LoadBalancerName": {
+              "Ref": "AWS::NoValue"
+            },
+            "TargetGroupArn": {
+              "Ref": "TargetGroup"
+            }
+          }
+        ],
+        "DeploymentConfiguration": {
+          "MaximumPercent": 200,
+          "MinimumHealthyPercent": 100
+        },
+        "DeploymentController": {
+          "Type": "ECS"
+        },
+        "Tags": []
+      },
+      "DependsOn": "Listener"
+    },
+    "LoadBalancer": {
+      "Type": "AWS::ElasticLoadBalancingV2::LoadBalancer",
+      "Properties": {
+        "Name": "book-service-1",
+        "SecurityGroups": [
+          "sg-0b752d4e5dd10e8b6"
+        ],
+        "Subnets": [
+          "subnet-03e609a66f3260f48",
+          "subnet-051022f508b9555a9"
+        ],
+        "Type": "application"
+      }
+    },
+    "TargetGroup": {
+      "Type": "AWS::ElasticLoadBalancingV2::TargetGroup",
+      "Properties": {
+        "Name": "book-service-1",
+        "VpcId": "vpc-0ecd7c4353c598277",
+        "Protocol": "HTTP",
+        "Port": 80,
+        "HealthCheckPath": "/book-store/resources/health",
+        "TargetType": "instance"
+      }
+    },
+    "Listener": {
+      "Type": "AWS::ElasticLoadBalancingV2::Listener",
+      "Properties": {
+        "DefaultActions": [
+          {
+            "TargetGroupArn": {
+              "Ref": "TargetGroup"
+            },
+            "Type": "forward"
+          }
+        ],
+        "LoadBalancerArn": {
+          "Ref": "LoadBalancer"
+        },
+        "Port": 80,
+        "Protocol": "HTTP"
+      }
+    }
+  },
+  "Outputs": {
+    "ClusterName": {
+      "Description": "The cluster used to create the service.",
+      "Value": {
+        "Ref": "ECSClusterName"
+      }
+    },
+    "ECSService": {
+      "Description": "The created service.",
+      "Value": {
+        "Ref": "ECSService"
+      }
+    },
+    "LoadBalancer": {
+      "Description": "The created load balancer.",
+      "Value": {
+        "Ref": "LoadBalancer"
+      }
+    },
+    "Listener": {
+      "Description": "The created listener.",
+      "Value": {
+        "Ref": "Listener"
+      }
+    },
+    "TargetGroup": {
+      "Description": "The created target group.",
+      "Value": {
+        "Ref": "TargetGroup"
+      }
+    }
+  }
+}
