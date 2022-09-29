@@ -9,4 +9,6 @@ public class HealthDto {
     private String hostName;
     private long maxHeap;
     private long tick;
+    private long instanceCount;
+    private int eventCount;
 }

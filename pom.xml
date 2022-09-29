@@ -89,6 +89,9 @@
                             <excludeArtifactIds>
                                 jakarta.jakartaee-api,
                                 payara-api,
+                                hazelcast,
+                                security-connectors-api,
+                                cache-api,
                                 lombok
                             </excludeArtifactIds>
                             <outputDirectory>${project.build.directory}/provided-dependencies</outputDirectory>
@@ -102,6 +105,33 @@
         </plugins>
     </build>
 
+    <dependencyManagement>
+        <dependencies>
+            <dependency>
+                <groupId>fish.payara.api</groupId>
+                <artifactId>payara-bom</artifactId>
+                <version>5.2022.2</version>
+                <type>pom</type>
+                <scope>import</scope>
+            </dependency>
+        </dependencies>
+    </dependencyManagement>
+
+    <repositories>
+        <repository>
+            <id>payara-patched-externals</id>
+            <name>Payara Patched Externals</name>
+            <url>https://nexus.payara.fish/repository/payara-artifacts/</url>
+            <releases>
+                <enabled>true</enabled>
+            </releases>
+            <snapshots>
+                <enabled>false</enabled>
+            </snapshots>
+        </repository>
+
+    </repositories>
+
     <dependencies>
         <dependency>
             <groupId>jakarta.platform</groupId>
@@ -112,7 +142,11 @@
         <dependency>
             <groupId>fish.payara.api</groupId>
             <artifactId>payara-api</artifactId>
-            <version>${dep.payara-api.version}</version>
+            <scope>provided</scope>
+        </dependency>
+        <dependency>
+            <groupId>com.hazelcast</groupId>
+            <artifactId>hazelcast</artifactId>
             <scope>provided</scope>
         </dependency>
         <dependency>

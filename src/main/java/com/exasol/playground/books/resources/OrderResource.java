@@ -1,15 +1,15 @@
 package com.exasol.playground.books.resources;
 
 import com.exasol.playground.books.service.OrderEvent;
-import com.exasol.playground.books.service.OrderService;
+import com.exasol.playground.books.service.OrderEventProducer;
 import jakarta.ejb.Stateless;
-import jakarta.enterprise.event.Event;
 import jakarta.inject.Inject;
-import jakarta.json.*;
+import jakarta.json.Json;
+import jakarta.json.JsonArrayBuilder;
+import jakarta.json.JsonObject;
+import jakarta.json.JsonObjectBuilder;
 import jakarta.ws.rs.*;
 import jakarta.ws.rs.core.MediaType;
-
-import java.util.List;
 
 @Path("order")
 @Produces(MediaType.APPLICATION_JSON)
@@ -18,29 +18,48 @@ import java.util.List;
 public class OrderResource {
 
     @Inject
-    private Event<OrderEvent> orderEvent;
+    private OrderEventProducer orderEventProducer;
 
     @Inject
-    private OrderService orderService;
+    private OrderEventClusteredService clusteredService;
 
     @GET
     @Path("fire/{type}")
-    public JsonObject order(@PathParam("type") String type) {
+    public JsonObject order(@PathParam("type") final String type) {
         final OrderEvent event = OrderEvent.create(type);
 
-        orderEvent.fire(event);
+        fireEvent(event);
 
-        final JsonObjectBuilder objectBuilder = Json.createObjectBuilder();
-        objectBuilder.add("id", event.getOrderId().toString());
+        final JsonObjectBuilder resultObject = Json.createObjectBuilder();
+        resultObject.add("id", event.getOrderId().toString());
 
-        return objectBuilder.build();
+        return resultObject.build();
     }
 
     @GET
-    @Path("list")
-    public JsonArray getOrderQueue() {
-        final JsonArrayBuilder arrayBuilder = Json.createArrayBuilder();
-        orderService.getQueuedEvents().forEach(arrayBuilder::add);
-        return arrayBuilder.build();
+    @Path("fire/{type}/{count}")
+    public JsonObject orderMany(@PathParam("type") final String type, @PathParam("count") final String count) {
+        final int eventCount = Integer.parseInt(count);
+
+        final JsonObjectBuilder resultObject = Json.createObjectBuilder();
+        final JsonArrayBuilder idArray = Json.createArrayBuilder();
+
+        for (int i = 0; i < eventCount; i++) {
+            final OrderEvent event = OrderEvent.create(type);
+            fireEvent(event);
+            idArray.add(event.getOrderId().toString());
+        }
+
+        resultObject.add("ids", idArray.build());
+
+        return resultObject.build();
+    }
+
+    private void fireEvent(final OrderEvent event) {
+        if(event.getType().equals("ejb")) {
+            clusteredService.fire(event);
+        } else {
+            orderEventProducer.queue(event);
+        }
     }
 }
