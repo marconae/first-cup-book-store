@@ -25,10 +25,10 @@ public class OrderEventProducer {
 
     @Inject
     @JMSConnectionFactory(CONNECTION_FACTORY_JNDI)
-    private transient JMSContext context;
+    private JMSContext context;
 
     @Resource(lookup = QUEUE_JNDI)
-    private transient Queue queue;
+    private Queue queue;
 
     public void queue(final @NonNull OrderEvent orderEvent) {
         log.info("Queuing: " + orderEvent);
