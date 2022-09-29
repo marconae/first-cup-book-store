@@ -10,6 +10,8 @@ services:
       - DB_HOST=repository
       - DB_PWD=postgres
       - PAYARA_INSTANCE_NAME=node-1
+    depends_on:
+        - "repository"
     networks:
       y-net:
         ipv4_address: 172.28.1.1
@@ -23,6 +25,9 @@ services:
       - DB_HOST=repository
       - DB_PWD=postgres
       - PAYARA_INSTANCE_NAME=node-2
+    depends_on:
+          - "repository"
+          - "book-store-1"
     networks:
       y-net:
         ipv4_address: 172.28.1.2
