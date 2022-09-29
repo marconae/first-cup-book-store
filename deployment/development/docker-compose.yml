@@ -1,6 +1,15 @@
 version: '2'
 
 services:
+  artemis:
+    image: artemis-ubuntu:latest
+    ports:
+      - "61616:61616"
+      - "8161:8161"
+    networks:
+      y-net:
+        ipv4_address: 172.28.1.10
+
   book-store-1:
     build:
       context: .
@@ -15,6 +24,9 @@ services:
       - DB_PWD=postgres
       - PAYARA_INSTANCE_NAME=node-1
       - PAYARA_ARGS=-d
+    depends_on:
+      - "artemis"
+      - "repository"
     networks:
       y-net:
         ipv4_address: 172.28.1.1
