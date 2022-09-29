@@ -7,9 +7,7 @@ ENV DB_PWD=postgres
 ENV DB_HOST=localhost
 
 
-RUN echo 'set-hazelcast-configuration --enabled=true --dynamic=true --clustermode multicast --multicastgroup 224.2.2.4 --multicastport 55000 --clustername book-store-grid --membergroup book-store-group' > $POSTBOOT_COMMANDS
-#RUN echo 'set ${Cluster-Config}.availability-service.web-container-availability.persistence-type=hazelcast' > $POSTBOOT_COMMANDS
-#RUN echo 'set ${Cluster-Config}.availability-service.ejb-container-availability.sfsb-ha-persistence-type=hazelcast' > $POSTBOOT_COMMANDS
+RUN echo 'set-hazelcast-configuration --enabled=true --dynamic=true --clustermode multicast --clustername book-store-grid --membergroup book-store-group' > $POSTBOOT_COMMANDS
 
 ENV COMMON_LIB_DIR ${PAYARA_DIR}/glassfish/domains/${DOMAIN_NAME}/lib
 COPY --chown=payara:payara target/provided-dependencies ${COMMON_LIB_DIR}/
