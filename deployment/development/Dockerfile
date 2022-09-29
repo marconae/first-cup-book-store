@@ -24,7 +24,7 @@ RUN curl --output ${ARCHIVE_DIR}/artemis-rar.rar https://repo1.maven.org/maven2/
 RUN echo deploy --type rar ${ARCHIVE_DIR}/artemis-rar.rar >> ${POSTBOOT_COMMANDS}
 
 RUN echo 'create-resource-adapter-config  --property ConnectorClassName="org.apache.activemq.artemis.core.remoting.impl.netty.NettyConnectorFactory":ConnectionParameters="host=artemis;port=61616":UserName="artemis":Password="artemis" artemis-rar' >> ${POSTBOOT_COMMANDS}
-RUN echo 'create-connector-connection-pool --raname artemis-rar --connectiondefinition org.apache.activemq.artemis.ra.ActiveMQRAConnectionFactory --ping true jms/ConnectionFactoryPool' >> ${POSTBOOT_COMMANDS}
+RUN echo 'create-connector-connection-pool --raname artemis-rar --property UserName="artemis":Password="artemis" --connectiondefinition org.apache.activemq.artemis.ra.ActiveMQRAConnectionFactory --ping true jms/ConnectionFactoryPool' >> ${POSTBOOT_COMMANDS}
 RUN echo 'create-connector-resource --poolname jms/ConnectionFactoryPool jms/myConnectionFactory' >> ${POSTBOOT_COMMANDS}
 
 #RUN echo deploy ${ARCHIVE_DIR}/book-store.war >> ${POSTBOOT_COMMANDS}

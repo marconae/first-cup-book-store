@@ -2,6 +2,7 @@ package com.exasol.playground.books.resources;
 
 import com.exasol.playground.books.dto.HealthDto;
 import com.exasol.playground.books.service.HealthService;
+import com.hazelcast.core.HazelcastInstance;
 import fish.payara.cdi.jsr107.impl.NamedCache;
 import jakarta.ejb.Stateless;
 import jakarta.inject.Inject;
@@ -27,15 +28,20 @@ public class HealthResource {
     private HealthService healthService;
 
     @Inject
+    private HazelcastInstance hazelcastInstance;
+
+    @Inject
     @NamedCache(cacheName = CLUSTER_CACHE_KEY)
     private Cache<String, Integer> cache;
 
     @GET
     public HealthDto getHealth() {
+        final String hostName = healthService.getHostName();
         return HealthDto.builder()
                 .maxHeap(healthService.getMaxHeap())
-                .hostName(healthService.getHostName())
+                .hostName(hostName)
                 .instanceCount(cache.get(INSTANCE_COUNT_KEY))
+                .eventCount(hazelcastInstance.getCPSubsystem().getAtomicLong(hostName).get())
                 .tick(getTick())
                 .build();
     }

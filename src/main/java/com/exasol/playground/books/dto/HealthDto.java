@@ -10,4 +10,5 @@ public class HealthDto {
     private long maxHeap;
     private long tick;
     private long instanceCount;
+    private long eventCount;
 }

@@ -33,4 +33,20 @@ public class OrderResource {
 
         return resultObject.build();
     }
+
+    @GET
+    @Path("fire/{type}/{amount}")
+    public JsonObject order(@PathParam("type") final String type, @PathParam("amount") final String amount) {
+
+        for (int i = 0; i < Integer.parseInt(amount); i++) {
+            final OrderEvent event = OrderEvent.create(type);
+            orderEventProducer.queue(event);
+        }
+
+
+        final JsonObjectBuilder resultObject = Json.createObjectBuilder();
+        resultObject.add("amount", amount);
+
+        return resultObject.build();
+    }
 }

@@ -3,7 +3,11 @@ package com.exasol.playground.books.service;
 import jakarta.annotation.Resource;
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.inject.Inject;
-import jakarta.jms.*;
+import jakarta.jms.JMSConnectionFactory;
+import jakarta.jms.JMSContext;
+import jakarta.jms.ObjectMessage;
+import jakarta.jms.Queue;
+import jakarta.resource.AdministeredObjectDefinition;
 import lombok.NonNull;
 import lombok.extern.java.Log;
 
@@ -11,15 +15,18 @@ import static com.exasol.playground.books.service.OrderEventProducer.QUEUE_JNDI;
 import static com.exasol.playground.books.service.OrderEventProducer.QUEUE_LABEL;
 
 @Log
-@JMSDestinationDefinition(
+
+@AdministeredObjectDefinition(
         name = QUEUE_JNDI,
-        interfaceName = "javax.jms.Queue",
-        destinationName = QUEUE_LABEL
-)
+        interfaceName = "jakarta.jms.Queue",
+        className = "org.apache.activemq.artemis.jms.client.ActiveMQQueue",
+        resourceAdapter = "artemis-rar",
+        properties = "Address=" + QUEUE_LABEL)
+
 @ApplicationScoped
 public class OrderEventProducer {
 
-    public static final String CONNECTION_FACTORY_JNDI = "jms/__defaultConnectionFactory";
+    public static final String CONNECTION_FACTORY_JNDI = "jms/myConnectionFactory";
     public static final String QUEUE_LABEL = "orderEventQueue";
     public static final String QUEUE_JNDI = "java:global/jms/orderEventQueue";
 
